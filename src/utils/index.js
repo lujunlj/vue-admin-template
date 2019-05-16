@@ -1,62 +1,45 @@
 /**
- * Created by PanJiaChen on 16/11/18.
+ * Created by jiachenpan on 16/11/18.
  */
 
-/**
- * Parse the time to string
- * @param {(Object|string|number)} time
- * @param {string} cFormat
- * @returns {string}
- */
-export function parseTime(time, cFormat) {
-  if (arguments.length === 0) {
-    return null
-  }
-  const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
-  let date
-  if (typeof time === 'object') {
-    date = time
+export function parseTime(time) {
+  if (time) {
+    var date = new Date(time)
+    var year = date.getFullYear()
+    /* 在日期格式中，月份是从0开始的，因此要加0
+     * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+     * */
+    var month =
+      date.getMonth() + 1 < 10
+        ? '0' + (date.getMonth() + 1)
+        : date.getMonth() + 1
+    var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+    var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+    var minutes =
+      date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+    var seconds =
+      date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+    // 拼接
+    return (
+      year +
+      '-' +
+      month +
+      '-' +
+      day +
+      ' ' +
+      hours +
+      ':' +
+      minutes +
+      ':' +
+      seconds
+    )
   } else {
-    if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
-      time = parseInt(time)
-    }
-    if ((typeof time === 'number') && (time.toString().length === 10)) {
-      time = time * 1000
-    }
-    date = new Date(time)
+    return ''
   }
-  const formatObj = {
-    y: date.getFullYear(),
-    m: date.getMonth() + 1,
-    d: date.getDate(),
-    h: date.getHours(),
-    i: date.getMinutes(),
-    s: date.getSeconds(),
-    a: date.getDay()
-  }
-  const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
-    let value = formatObj[key]
-    // Note: getDay() returns 0 on Sunday
-    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
-    if (result.length > 0 && value < 10) {
-      value = '0' + value
-    }
-    return value || 0
-  })
-  return time_str
 }
 
-/**
- * @param {number} time
- * @param {string} option
- * @returns {string}
- */
 export function formatTime(time, option) {
-  if (('' + time).length === 10) {
-    time = parseInt(time) * 1000
-  } else {
-    time = +time
-  }
+  time = +time * 1000
   const d = new Date(time)
   const now = Date.now()
 
@@ -89,22 +72,64 @@ export function formatTime(time, option) {
   }
 }
 
-/**
- * @param {string} url
- * @returns {Object}
- */
-export function param2Obj(url) {
-  const search = url.split('?')[1]
-  if (!search) {
-    return {}
+export function debounce(func, wait, immediate) {
+  let timeout, args, context, timestamp, result
+
+  const later = function() {
+    // 据上一次触发时间间隔
+    const last = +new Date() - timestamp
+
+    // 上次被包装函数被调用时间间隔last小于设定时间间隔wait
+    if (last < wait && last > 0) {
+      timeout = setTimeout(later, wait - last)
+    } else {
+      timeout = null
+      // 如果设定为immediate===true，因为开始边界已经调用过了此处无需调用
+      if (!immediate) {
+        result = func.apply(context, args)
+        if (!timeout) context = args = null
+      }
+    }
   }
-  return JSON.parse(
-    '{"' +
-      decodeURIComponent(search)
-        .replace(/"/g, '\\"')
-        .replace(/&/g, '","')
-        .replace(/=/g, '":"')
-        .replace(/\+/g, ' ') +
-      '"}'
-  )
+
+  return function(...args) {
+    context = this
+    timestamp = +new Date()
+    const callNow = immediate && !timeout
+    // 如果延时不存在，重新设定延时
+    if (!timeout) timeout = setTimeout(later, wait)
+    if (callNow) {
+      result = func.apply(context, args)
+      context = args = null
+    }
+
+    return result
+  }
+}
+
+export function isExternal(path) {
+  return /^(https?:|mailto:|tel:)/.test(path)
+}
+
+// 替换邮箱字符
+export function regEmail(email) {
+  if (String(email).indexOf('@') > 0) {
+    const str = email.split('@')
+    let _s = ''
+    if (str[0].length > 3) {
+      for (var i = 0; i < str[0].length - 3; i++) {
+        _s += '*'
+      }
+    }
+    var new_email = str[0].substr(0, 3) + _s + '@' + str[1]
+  }
+  return new_email
+}
+
+// 替换手机字符
+export function regMobile(mobile) {
+  if (mobile.length > 7) {
+    var new_mobile = mobile.substr(0, 3) + '****' + mobile.substr(7)
+  }
+  return new_mobile
 }

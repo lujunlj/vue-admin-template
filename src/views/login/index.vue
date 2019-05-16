@@ -1,6 +1,11 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+    <el-form ref="loginForm"
+             :model="loginForm"
+             :rules="loginRules"
+             class="login-form"
+             auto-complete="on"
+             label-position="left">
 
       <div class="title-container">
         <h3 class="title">Login Form</h3>
@@ -10,42 +15,46 @@
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+        <el-input ref="username"
+                  v-model="loginForm.username"
+                  placeholder="用户名"
+                  name="username"
+                  type="text"
+                  tabindex="1"
+                  auto-complete="on" />
       </el-form-item>
 
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
+        <el-input :key="passwordType"
+                  ref="password"
+                  v-model="loginForm.password"
+                  :type="passwordType"
+                  placeholder="密码"
+                  name="password"
+                  tabindex="2"
+                  auto-complete="on"
+                  @keyup.enter.native="handleLogin" />
+        <span class="show-pwd"
+              @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-checkbox v-model="loginForm.rememberMe"
+                   style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <el-button :loading="loading"
+                 type="primary"
+                 style="width:100%;margin-bottom:30px;"
+                 @click.native.prevent="handleLogin">
+        <span v-if="!loading">登 录</span>
+        <span v-else>登 录 中...</span>
+      </el-button>
 
       <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
+        <span> password: 123</span>
       </div>
 
     </el-form>
@@ -54,28 +63,30 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
-
+import Config from '@/config'
+import Cookies from 'js-cookie'
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        // callback(new Error('Please enter the correct user name'))
+        callback()
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+      if (value.length < 3) {
+        callback(new Error('The password can not be less than 3 digits'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -94,6 +105,9 @@ export default {
       immediate: true
     }
   },
+  created() {
+    this.getCookie()
+  },
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -105,11 +119,33 @@ export default {
         this.$refs.password.focus()
       })
     },
+    getCookie() {
+      const username = Cookies.get('username')
+      let password = Cookies.get('password')
+      const rememberMe = Cookies.get('rememberMe')
+      // 保存cookie里面的加密后的密码
+      password = password === undefined ? '' : password
+      this.loginForm = {
+        username: username === undefined ? '' : username,
+        password: password,
+        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
+      }
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
+        const user = this.loginForm
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
+          if (user.rememberMe) {
+            Cookies.set('username', user.username, { expires: Config.passCookieExpires })
+            Cookies.set('password', user.password, { expires: Config.passCookieExpires })
+            Cookies.set('rememberMe', user.rememberMe, { expires: Config.passCookieExpires })
+          } else {
+            Cookies.remove('username')
+            Cookies.remove('password')
+            Cookies.remove('rememberMe')
+          }
+          this.$store.dispatch('Login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {
@@ -129,8 +165,8 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
-$light_gray:#fff;
+$bg: #283443;
+$light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -141,6 +177,13 @@ $cursor: #fff;
 
 /* reset element-ui css */
 .login-container {
+  display: flex;
+  justify-content: center;
+  // align-items: center;
+  height: 100%;
+  background-image: url(https://aurora-1255840532.cos.ap-chengdu.myqcloud.com/1547428971990.jpg);
+  background-size: cover;
+
   .el-input {
     display: inline-block;
     height: 47px;
@@ -173,9 +216,9 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   min-height: 100%;

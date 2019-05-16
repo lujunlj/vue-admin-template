@@ -1,24 +1,46 @@
 import request from '@/utils/request'
 
-export function login(data) {
+export function add(data) {
   return request({
-    url: '/user/login',
+    url: 'api/users',
     method: 'post',
     data
   })
 }
 
-export function getInfo(token) {
+export function del(id) {
   return request({
-    url: '/user/info',
-    method: 'get',
-    params: { token }
+    url: 'api/users/' + id,
+    method: 'delete'
   })
 }
 
-export function logout() {
+export function edit(data) {
   return request({
-    url: '/user/logout',
-    method: 'post'
+    url: 'api/users',
+    method: 'put',
+    data
+  })
+}
+
+export function validPass(pass) {
+  return request({
+    url: 'api/users/validPass/' + pass,
+    method: 'get'
+  })
+}
+
+export function updatePass(pass) {
+  return request({
+    url: 'api/users/updatePass/' + pass,
+    method: 'get'
+  })
+}
+
+export function updateEmail(code, data) {
+  return request({
+    url: 'api/users/updateEmail/' + code,
+    method: 'post',
+    data
   })
 }

@@ -1,30 +1,43 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
+    <component :is="currentRole" />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import adminDashboard from './admin'
+import { count } from '@/api/visits'
+
+/**
+ * 记录访问，只有页面刷新或者第一次加载才会记录
+ */
+count().then(res => { })
 
 export default {
   name: 'Dashboard',
+  components: { adminDashboard },
+  data() {
+    return {
+      currentRole: 'adminDashboard'
+    }
+  },
   computed: {
     ...mapGetters([
-      'name'
+      'roles'
     ])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
-  }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
-  }
-}
+// .dashboard {
+//   &-container {
+//     margin: 30px;
+//   }
+//   &-text {
+//     font-size: 30px;
+//     line-height: 46px;
+//   }
+// }
 </style>
