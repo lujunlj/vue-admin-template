@@ -2,12 +2,12 @@
   <el-dialog :append-to-body="true" :visible.sync="dialog" :title="isAdd ? '新增部门' : '编辑部门'" width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="名称" prop="name">
-        <el-input v-model="form.name" style="width: 370px;"/>
+        <el-input v-model="form.name" style="width: 370px;" />
       </el-form-item>
-      <el-form-item v-if="form.pid !== 0" label="状态" prop="enabled">
-        <el-radio v-for="item in dicts" :key="item.id" v-model="form.enabled" :label="item.value">{{ item.label }}</el-radio>
+      <el-form-item v-if="form.pid !== '0'" label="状态" prop="enabled">
+        <el-radio v-for="item in dicts" :key="item.uuid" v-model="form.enabled" :label="item.value">{{ item.label }}</el-radio>
       </el-form-item>
-      <el-form-item v-if="form.pid !== 0" style="margin-bottom: 0px;" label="上级部门">
+      <el-form-item v-if="form.pid !== '0'" prop="pid" style="margin-bottom: 0px;" label="上级部门">
         <treeselect v-model="form.pid" :options="depts" style="width: 370px;" placeholder="选择上级类目" />
       </el-form-item>
     </el-form>
@@ -20,8 +20,9 @@
 
 <script>
 import { add, edit, getDepts } from '@/api/dept'
-import Treeselect from '@riophae/vue-treeselect'
+import { Treeselect } from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+
 export default {
   components: { Treeselect },
   props: {
@@ -29,7 +30,7 @@ export default {
       type: Boolean,
       required: true
     },
-    sup_this: {
+    supThis: {
       type: Object,
       default: null
     },
@@ -39,17 +40,29 @@ export default {
     }
   },
   data() {
+    const validPid = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('上级部门不能为空'))
+      } else if (value === this.form.uuid) {
+        callback(new Error('上级部门不能为自身'))
+      } else {
+        callback()
+      }
+    }
     return {
       loading: false, dialog: false, depts: [],
       form: {
-        id: '',
+        uuid: '',
         name: '',
-        pid: 1,
+        pid: '1',
         enabled: 'true'
       },
       rules: {
         name: [
           { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        pid: [
+          { required: true, validator: validPid, trigger: 'blur' }
         ]
       }
     }
@@ -109,14 +122,15 @@ export default {
       this.dialog = false
       this.$refs['form'].resetFields()
       this.form = {
-        id: '',
+        uuid: '',
         name: '',
-        pid: 1,
+        pid: '1',
         enabled: 'true'
       }
     },
     getDepts() {
       getDepts({ enabled: true }).then(res => {
+        console.log(res.content)
         this.depts = res.content
       })
     }
@@ -125,5 +139,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

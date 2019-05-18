@@ -1,43 +1,27 @@
 <template>
-  <el-table :data="formatData"
-            :row-style="showRow"
-            v-bind="$attrs">
-    <el-table-column v-if="columns.length===0"
-                     width="150">
+  <el-table :data="formatData" :row-style="showRow" v-bind="$attrs" row-key="uuid" :row-class-name="rowClassName" @row-click="clickRow">
+    <el-table-column v-if="columns.length===0" width="150">
       <template slot-scope="scope">
-        <span v-for="space in scope.row._level"
-              :key="space"
-              class="ms-tree-space" />
-        <span v-if="iconShow(0,scope.row)"
-              class="tree-ctrl"
-              @click="toggleExpanded(scope.$index)">
-          <i v-if="!scope.row._expanded"
-             class="el-icon-plus" />
-          <i v-else
-             class="el-icon-minus" />
+        <span v-for="space in scope.row._level" :key="space" class="ms-tree-space" />
+        <span v-if="iconShow(0,scope.row)" class="tree-ctrl" @click.stop="toggleExpanded(scope.$index)">
+          <!--el-icon-plus el-icon-minus-->
+          <i v-if="!scope.row._expanded" class="el-icon-caret-right" />
+          <i v-else class="el-icon-caret-bottom" />
         </span>
         {{ scope.$index }}
       </template>
     </el-table-column>
-    <el-table-column v-for="(column, index) in columns"
-                     v-else
-                     :key="column.value"
-                     :label="column.text"
-                     :width="column.width">
+    <el-table-column v-for="(column, index) in columns" v-else :key="column.value" :label="column.text" :width="column.width">
       <template slot-scope="scope">
         <!-- Todo -->
-        <!-- eslint-disable-next-line vue/no-confusing-v-for-v-if -->
-        <span v-for="space in scope.row._level"
-              v-if="index === 0"
-              :key="space"
-              class="ms-tree-space" />
-        <span v-if="iconShow(index,scope.row)"
-              class="tree-ctrl"
-              @click="toggleExpanded(scope.$index)">
-          <i v-if="!scope.row._expanded"
-             class="el-icon-plus" />
-          <i v-else
-             class="el-icon-minus" />
+        <!-- <span v-for="space in scope.row._level" v-if="index === 0" :key="space" class="ms-tree-space" /> -->
+        <!-- <span v-for="space in scope.row._level" :key="space" :class="{ 'ms-tree-space': index === 0 }" /> -->
+        <template v-if="index === 0">
+          <span v-for="space in scope.row._level" :key="space" class="ms-tree-space" />
+        </template>
+        <span v-if="iconShow(index,scope.row)" class="tree-ctrl" @click.stop="toggleExpanded(scope.$index)">
+          <i v-if="!scope.row._expanded" class="el-icon-caret-right" />
+          <i v-else class="el-icon-caret-bottom" />
         </span>
         {{ scope.row[column.value] }}
       </template>
@@ -86,6 +70,12 @@ export default {
     }
   },
   methods: {
+    rowClassName: function ({ row, rowIndex }) {
+      row.index = rowIndex
+    },
+    clickRow: function (row, column, event) {
+      this.toggleExpanded(row.index)
+    },
     showRow: function (row) {
       const show = (row.row.parent ? (row.row.parent._expanded && row.row.parent._show) : true)
       row.row._show = show
@@ -98,7 +88,7 @@ export default {
     },
     // 图标显示
     iconShow (index, record) {
-      return (index === 0 && record.children && record.children.length > 0)
+      return (index === 0 && record.childrens && record.childrens.length > 0)
     }
   }
 }
@@ -153,3 +143,9 @@ table td {
   margin-left: -$space-width;
 }
 </style>
+<style>
+.el-table .el-table__expand-icon {
+  display: none !important;
+}
+</style>
+

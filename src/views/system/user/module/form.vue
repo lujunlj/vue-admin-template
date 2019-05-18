@@ -1,73 +1,38 @@
 <template>
-  <el-dialog :visible.sync="dialog"
-             :title="isAdd ? '新增用户' : '编辑用户'"
-             append-to-body
-             width="570px">
-    <el-form ref="form"
-             :inline="true"
-             :model="form"
-             :rules="rules"
-             size="small"
-             label-width="66px">
-      <el-form-item label="姓名"
-                    prop="name">
+  <el-dialog :visible.sync="dialog" :title="isAdd ? '新增用户' : '编辑用户'" append-to-body width="570px">
+    <el-form ref="form" :inline="true" :model="form" :rules="rules" size="small" label-width="66px">
+      <el-form-item label="姓名" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="用户名"
-                    prop="username">
+      <el-form-item label="用户名" prop="username">
         <el-input v-model="form.username" />
       </el-form-item>
-      <el-form-item label="电话"
-                    prop="phone">
+      <el-form-item label="电话" prop="phone">
         <el-input v-model.number="form.phone" />
       </el-form-item>
-      <el-form-item label="邮箱"
-                    prop="email">
+      <el-form-item label="邮箱" prop="email">
         <el-input v-model="form.email" />
       </el-form-item>
       <el-form-item label="部门">
-        <treeselect v-model="deptId"
-                    :options="depts"
-                    :style="style"
-                    placeholder="选择部门"
-                    @select="selectFun" />
+        <treeselect v-model="deptId" :options="depts" :style="style" placeholder="选择部门" @select="selectFun" />
       </el-form-item>
       <el-form-item label="岗位">
-        <el-select v-model="jobId"
-                   :style="style"
-                   placeholder="请先选择部门">
-          <el-option v-for="(item, index) in jobs"
-                     :key="item.name + index"
-                     :label="item.name"
-                     :value="item.uuid" />
+        <el-select v-model="jobId" :style="style" placeholder="请先选择部门">
+          <el-option v-for="(item, index) in jobs" :key="item.name + index" :label="item.name" :value="item.uuid" />
         </el-select>
       </el-form-item>
       <el-form-item label="角色">
-        <el-select v-model="roleIds"
-                   style="width: 450px;"
-                   multiple
-                   placeholder="请选择">
-          <el-option v-for="(item, index) in roles"
-                     :key="item.name + index"
-                     :label="item.name"
-                     :value="item.uuid" />
+        <el-select v-model="roleIds" style="width: 450px;" multiple placeholder="请选择">
+          <el-option v-for="(item, index) in roles" :key="item.name + index" :label="item.name" :value="item.uuid" />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态"
-                    prop="enabled">
-        <el-radio v-for="item in dicts"
-                  :key="item.uuid"
-                  v-model="form.enabled"
-                  :label="item.value">{{ item.label }}</el-radio>
+      <el-form-item label="状态" prop="enabled">
+        <el-radio v-for="item in dicts" :key="item.uuid" v-model="form.enabled" :label="item.value">{{ item.label }}</el-radio>
       </el-form-item>
     </el-form>
-    <div slot="footer"
-         class="dialog-footer">
-      <el-button :loading="loading"
-                 type="primary"
-                 @click="doSubmit">确认</el-button>
-      <el-button type="text"
-                 @click="cancel">取消</el-button>
+    <div slot="footer" class="dialog-footer">
+      <el-button :loading="loading" type="primary" @click="doSubmit">确认</el-button>
+      <el-button type="text" @click="cancel">取消</el-button>
     </div>
   </el-dialog>
 </template>
