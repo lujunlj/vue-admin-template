@@ -2,13 +2,13 @@
   <el-dialog :append-to-body="true" :visible.sync="dialog" :title="isAdd ? '新增字典详情' : '编辑字典详情'" width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="字典标签" prop="label">
-        <el-input v-model="form.label" style="width: 370px;"/>
+        <el-input v-model="form.label" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="字典值">
-        <el-input v-model="form.value" style="width: 370px;"/>
+        <el-input v-model="form.value" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="排序" prop="sort">
-        <el-input-number v-model.number="form.sort" :min="0" :max="999" controls-position="right" style="width: 370px;"/>
+        <el-input-number v-model.number="form.sort" :min="0" :max="999" controls-position="right" style="width: 370px;" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -26,12 +26,13 @@ export default {
       type: Boolean,
       required: true
     },
+    /* eslint-disable vue/prop-name-casing */
     sup_this: {
       type: Object,
       default: null
     },
     dictId: {
-      type: Number,
+      type: String,
       required: true
     }
   },
@@ -39,7 +40,7 @@ export default {
     return {
       loading: false, dialog: false,
       form: {
-        id: '',
+        uuid: '',
         label: '',
         value: '',
         sort: 999
@@ -59,7 +60,7 @@ export default {
       this.resetForm()
     },
     doSubmit() {
-      this.form['dict'] = { id: this.dictId }
+      this.form['dict'] = { uuid: this.dictId }
       this.$refs['form'].validate((valid) => {
         if (valid) {
           this.loading = true
@@ -103,7 +104,7 @@ export default {
       this.dialog = false
       this.$refs['form'].resetFields()
       this.form = {
-        id: '',
+        uuid: '',
         label: '',
         value: '',
         sort: '999'
@@ -114,7 +115,7 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  /deep/ .el-input-number .el-input__inner {
-    text-align: left;
-  }
+/deep/ .el-input-number .el-input__inner {
+  text-align: left;
+}
 </style>

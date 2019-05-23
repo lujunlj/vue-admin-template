@@ -37,7 +37,7 @@ export default {
     beforeInit() {
       this.url = 'api/logs/user'
       // const sort = 'id,desc'
-      this.params = { pageNum: this.pageNum, pageSize: this.pageSize }
+      this.params = { current: this.current, size: this.size }
       return true
     }
   }

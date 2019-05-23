@@ -30,7 +30,8 @@ export default {
       type: Boolean,
       required: true
     },
-    supThis: {
+    /* eslint-disable vue/prop-name-casing */
+    sup_this: {
       type: Object,
       default: null
     },
@@ -112,7 +113,7 @@ export default {
           duration: 2500
         })
         this.loading = false
-        this.sup_this.init()
+        this.$parent.sup_this.init()
       }).catch(err => {
         this.loading = false
         console.log(err.response.data.message)

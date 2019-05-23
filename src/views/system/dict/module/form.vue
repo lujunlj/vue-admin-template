@@ -2,10 +2,10 @@
   <el-dialog :append-to-body="true" :visible.sync="dialog" :title="isAdd ? '新增字典' : '编辑字典'" width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="字典名称" prop="name">
-        <el-input v-model="form.name" style="width: 370px;"/>
+        <el-input v-model="form.name" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="描述">
-        <el-input v-model="form.remark" style="width: 370px;"/>
+        <el-input v-model="form.remark" style="width: 370px;" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -23,6 +23,7 @@ export default {
       type: Boolean,
       required: true
     },
+    /* eslint-disable vue/prop-name-casing */
     sup_this: {
       type: Object,
       default: null
@@ -32,7 +33,7 @@ export default {
     return {
       loading: false, dialog: false,
       form: {
-        id: '',
+        uuid: '',
         name: '',
         remark: ''
       },
@@ -91,7 +92,7 @@ export default {
       this.dialog = false
       this.$refs['form'].resetFields()
       this.form = {
-        id: '',
+        uuid: '',
         name: '',
         remark: ''
       }
@@ -101,5 +102,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

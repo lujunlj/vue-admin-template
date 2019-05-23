@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     toQuery() {
-      this.$parent.pageNum = 1
+      this.$parent.current = 1
       this.$parent.init()
     }
   }

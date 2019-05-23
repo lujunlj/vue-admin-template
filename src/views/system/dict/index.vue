@@ -5,32 +5,21 @@
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span>字典列表</span>
-            <el-button
-              v-if="checkPermission(['ADMIN','DICT_ALL','DICT_CREATE'])"
-              class="filter-item"
-              size="mini"
-              style="float: right;padding: 4px 10px"
-              type="primary"
-              icon="el-icon-plus"
-              @click="$refs.header.$refs.form.dialog = true">新增</el-button>
+            <el-button v-if="checkPermission(['ADMIN','DICT_ALL','DICT_CREATE'])" class="filter-item" size="mini" style="float: right;padding: 4px 10px" type="primary" icon="el-icon-plus" @click="$refs.header.$refs.form.dialog = true">新增</el-button>
           </div>
-          <eHeader ref="header" :query="query" :sup_this="sup_this"/>
+          <eHeader ref="header" :query="query" :sup_this="sup_this" />
           <!--表格渲染-->
           <el-table v-loading="loading" :data="data" size="small" highlight-current-row style="width: 100%;" @current-change="handleCurrentChange">
-            <el-table-column :show-overflow-tooltip="true" prop="name" label="名称"/>
-            <el-table-column :show-overflow-tooltip="true" prop="remark" label="描述"/>
+            <el-table-column :show-overflow-tooltip="true" prop="name" label="名称" />
+            <el-table-column :show-overflow-tooltip="true" prop="remark" label="描述" />
             <el-table-column label="操作" width="150px" align="center">
               <template slot-scope="scope">
-                <edit v-if="checkPermission(['ADMIN','DICT_ALL','DICT_EDIT'])" :data="scope.row" :sup_this="sup_this"/>
-                <el-popover
-                  v-if="checkPermission(['ADMIN','DICT_ALL','DICT_DELETE'])"
-                  :ref="scope.row.id"
-                  placement="top"
-                  width="180">
+                <edit v-if="checkPermission(['ADMIN','DICT_ALL','DICT_EDIT'])" :data="scope.row" :sup_this="sup_this" />
+                <el-popover v-if="checkPermission(['ADMIN','DICT_ALL','DICT_DELETE'])" :ref="scope.row.uuid" placement="top" width="180">
                   <p>此操作将删除字典与对应的字典详情，确定要删除吗？</p>
                   <div style="text-align: right; margin: 0">
-                    <el-button size="mini" type="text" @click="$refs[scope.row.id].doClose()">取消</el-button>
-                    <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定</el-button>
+                    <el-button size="mini" type="text" @click="$refs[scope.row.uuid].doClose()">取消</el-button>
+                    <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.uuid)">确定</el-button>
                   </div>
                   <el-button slot="reference" type="danger" size="mini">删除</el-button>
                 </el-popover>
@@ -38,12 +27,7 @@
             </el-table-column>
           </el-table>
           <!--分页组件-->
-          <el-pagination
-            :total="total"
-            style="margin-top: 8px;"
-            layout="total, prev, pager, next, sizes"
-            @size-change="sizeChange"
-            @current-change="pageChange"/>
+          <el-pagination :total="total" style="margin-top: 8px;" layout="total, prev, pager, next, sizes" @size-change="sizeChange" @current-change="pageChange" />
         </el-card>
       </el-col>
       <el-col :xs="24" :sm="24" :md="14" :lg="14" :xl="14">
@@ -54,16 +38,9 @@
                 {{ this.$refs.dictDetail ? this.$refs.dictDetail.dictName : '' }}
               </span>
             </span>
-            <el-button
-              v-if="checkPermission(['ADMIN','DICT_ALL','DICT_CREATE']) && this.$refs.dictDetail && this.$refs.dictDetail.dictName"
-              class="filter-item"
-              size="mini"
-              style="float: right;padding: 4px 10px"
-              type="primary"
-              icon="el-icon-plus"
-              @click="$refs.dictDetail.$refs.header.$refs.form.dialog = true">新增</el-button>
+            <el-button v-if="checkPermission(['ADMIN','DICT_ALL','DICT_CREATE']) && this.$refs.dictDetail && this.$refs.dictDetail.dictName" class="filter-item" size="mini" style="float: right;padding: 4px 10px" type="primary" icon="el-icon-plus" @click="$refs.dictDetail.$refs.header.$refs.form.dialog = true">新增</el-button>
           </div>
-          <dictDetail ref="dictDetail"/>
+          <dictDetail ref="dictDetail" />
         </el-card>
       </el-col>
     </el-row>
@@ -94,8 +71,8 @@ export default {
     checkPermission,
     beforeInit() {
       this.url = 'api/dict'
-      const sort = 'id,desc'
-      this.params = { page: this.page, size: this.size, sort: sort }
+      // const sort = 'uuid,desc'
+      this.params = { current: this.current, size: this.size }
       const query = this.query
       const type = query.type
       const value = query.value
@@ -106,11 +83,11 @@ export default {
       }
       return true
     },
-    subDelete(id) {
+    subDelete(uuid) {
       this.delLoading = true
-      del(id).then(res => {
+      del(uuid).then(res => {
         this.delLoading = false
-        this.$refs[id].doClose()
+        this.$refs[uuid].doClose()
         this.init()
         this.$notify({
           title: '删除成功',
@@ -119,14 +96,14 @@ export default {
         })
       }).catch(err => {
         this.delLoading = false
-        this.$refs[id].doClose()
+        this.$refs[uuid].doClose()
         console.log(err.response.data.message)
       })
     },
     handleCurrentChange(val) {
       if (val) {
         this.$refs.dictDetail.dictName = val.name
-        this.$refs.dictDetail.dictId = val.id
+        this.$refs.dictDetail.dictId = val.uuid
         this.$refs.dictDetail.init()
       }
     }
@@ -135,5 +112,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

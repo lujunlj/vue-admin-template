@@ -3,8 +3,8 @@ import request from '@/utils/request'
 export function get(dictName) {
   const params = {
     dictName,
-    pageNum: 1,
-    pageSize: 9999
+    current: 1,
+    size: 9999
   }
   return request({
     url: 'api/dictDetail',

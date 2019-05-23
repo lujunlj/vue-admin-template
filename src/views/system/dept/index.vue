@@ -68,7 +68,7 @@ export default {
     beforeInit() {
       this.url = 'api/dept'
       // const sort = 'id,desc'
-      this.params = { pageNum: this.page, pageSize: this.size }
+      this.params = { current: this.page, size: this.size }
       const query = this.query
       const value = query.value
       const enabled = query.enabled

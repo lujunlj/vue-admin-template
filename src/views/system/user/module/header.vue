@@ -63,7 +63,7 @@ export default {
     },
     // 去查询
     toQuery() {
-      this.sup_this.pageNum = 1
+      this.sup_this.current = 1
       this.sup_this.init()
     },
     // 导出

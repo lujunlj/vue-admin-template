@@ -54,7 +54,7 @@ export default {
       const query = this.query
       const username = query.username
       const logType = query.logType
-      this.params = { pageNum: this.pageNum, pageSize: this.pageSize }
+      this.params = { current: this.current, size: this.size }
       if (username && username) { this.params['username'] = username }
       if (logType !== '' && logType !== null) { this.params['logType'] = logType }
       return true

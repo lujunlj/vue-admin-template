@@ -4,8 +4,8 @@ export function getAllJob(deptId, enabled) {
   const params = {
     deptId,
     enabled: enabled,
-    pageNum: 1,
-    pageSize: 9999
+    current: 1,
+    size: 9999
   }
   return request({
     url: 'api/job',

@@ -45,7 +45,7 @@ export default {
       // const sort = 'id,desc'
       const query = this.query
       const username = query.username
-      this.params = { pageNum: this.pageNum, pageSize: this.pageSize }
+      this.params = { current: this.current, size: this.size }
       if (username && username) { this.params['username'] = username }
       return true
     }

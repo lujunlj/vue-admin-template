@@ -100,7 +100,7 @@ export default {
       const value = query.value
       const enabled = query.enabled
       // this.params = { page: this.page, size: this.size, sort: sort, deptId: this.deptId }
-      this.params = { pageNum: this.pageNum, pageSize: this.pageSize, deptId: this.deptId }
+      this.params = { current: this.current, size: this.size, deptId: this.deptId }
       if (type && value) { this.params[type] = value }
       if (enabled !== '' && enabled !== null) { this.params['enabled'] = enabled }
       return true

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-button size="mini" type="success" @click="to">编辑</el-button>
-    <eForm ref="form" :sup_this="sup_this" :is-add="false" :dict-id="dictId"/>
+    <eForm ref="form" :sup_this="sup_this" :is-add="false" :dict-id="dictId" />
   </div>
 </template>
 <script>
@@ -13,12 +13,13 @@ export default {
       type: Object,
       required: true
     },
+    /* eslint-disable vue/prop-name-casing */
     sup_this: {
       type: Object,
       required: true
     },
     dictId: {
-      type: Number,
+      type: String,
       required: true
     }
   },
@@ -26,7 +27,7 @@ export default {
     to() {
       const _this = this.$refs.form
       _this.form = {
-        id: this.data.id,
+        uuid: this.data.uuid,
         label: this.data.label,
         value: this.data.value,
         sort: this.data.sort
@@ -38,8 +39,8 @@ export default {
 </script>
 
 <style scoped>
-  div{
-    display: inline-block;
-    margin-right: 3px;
-  }
+div {
+  display: inline-block;
+  margin-right: 3px;
+}
 </style>

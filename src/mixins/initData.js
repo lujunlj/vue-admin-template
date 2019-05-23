@@ -5,8 +5,8 @@ export default {
     return {
       loading: true,
       data: [],
-      pageNum: 1,
-      pageSize: 10,
+      current: 1,
+      size: 10,
       total: 0,
       url: '',
       params: {},
@@ -40,13 +40,13 @@ export default {
       return true
     },
     pageChange(e) {
-      this.pageNum = e
+      this.current = e
       this.init()
     },
     sizeChange(e) {
       // 分页控件切换每页页数 不初始化页数 所以注释掉
-      // this.pageNum = 1
-      this.pageSize = e
+      // this.current = 1
+      this.size = e
       this.init()
     }
   }
