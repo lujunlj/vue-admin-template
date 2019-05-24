@@ -2,22 +2,18 @@
   <el-dialog :visible.sync="dialog" :title="isAdd ? '新增角色' : '编辑角色'" append-to-body width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="角色名称" prop="name">
-        <el-input v-model="form.name" style="width: 370px;"/>
+        <el-input v-model="form.name" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="数据范围">
         <el-select v-model="form.dataScope" style="width: 370px" placeholder="请选择数据范围" @change="changeScope">
-          <el-option
-            v-for="item in dateScopes"
-            :key="item"
-            :label="item"
-            :value="item"/>
+          <el-option v-for="item in dateScopes" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item v-if="form.dataScope === '自定义'" label="数据权限">
         <treeselect v-model="deptIds" :options="depts" multiple style="width: 370px" placeholder="请选择" />
       </el-form-item>
       <el-form-item label="描述信息">
-        <el-input v-model="form.remark" style="width: 370px;" rows="5" type="textarea"/>
+        <el-input v-model="form.remark" style="width: 370px;" rows="5" type="textarea" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -39,6 +35,7 @@ export default {
       type: Boolean,
       required: true
     },
+    /* eslint-disable vue/prop-name-casing */
     sup_this: {
       type: Object,
       default: null
@@ -71,7 +68,7 @@ export default {
         if (this.form.dataScope === '自定义') {
           for (let i = 0; i < this.deptIds.length; i++) {
             this.form.depts.push({
-              id: this.deptIds[i]
+              uuid: this.deptIds[i]
             })
           }
         }
@@ -137,5 +134,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

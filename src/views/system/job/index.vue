@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
-    <eHeader :query="query" :dicts="dicts"/>
+    <eHeader :query="query" :dicts="dicts" />
     <!--表格渲染-->
     <el-table v-loading="loading" :data="data" size="small" style="width: 100%;">
-      <el-table-column prop="name" label="名称"/>
+      <el-table-column prop="name" label="名称" />
       <el-table-column label="所属部门">
         <template slot-scope="scope">
           <div>{{ scope.row.dept.name }}</div>
@@ -16,7 +16,7 @@
       </el-table-column>
       <el-table-column label="状态" align="center">
         <template slot-scope="scope">
-          <div v-for="item in dicts" :key="item.id">
+          <div v-for="item in dicts" :key="item.uuid">
             <el-tag v-if="scope.row.enabled.toString() === item.value" :type="scope.row.enabled ? '' : 'info'">{{ item.label }}</el-tag>
           </div>
         </template>
@@ -28,16 +28,12 @@
       </el-table-column>
       <el-table-column label="操作" width="150px" align="center">
         <template slot-scope="scope">
-          <edit v-if="checkPermission(['ADMIN','USERJOB_ALL','USERJOB_EDIT'])" :dicts="dicts" :data="scope.row" :sup_this="sup_this"/>
-          <el-popover
-            v-if="checkPermission(['ADMIN','USERJOB_ALL','USERJOB_DELETE'])"
-            :ref="scope.row.id"
-            placement="top"
-            width="180">
+          <edit v-if="checkPermission(['ADMIN','USERJOB_ALL','USERJOB_EDIT'])" :dicts="dicts" :data="scope.row" :sup_this="sup_this" />
+          <el-popover v-if="checkPermission(['ADMIN','USERJOB_ALL','USERJOB_DELETE'])" :ref="scope.row.uuid" placement="top" width="180">
             <p>确定删除本条数据吗？</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="$refs[scope.row.id].doClose()">取消</el-button>
-              <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定</el-button>
+              <el-button size="mini" type="text" @click="$refs[scope.row.uuid].doClose()">取消</el-button>
+              <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.uuid)">确定</el-button>
             </div>
             <el-button slot="reference" type="danger" size="mini">删除</el-button>
           </el-popover>
@@ -45,12 +41,7 @@
       </el-table-column>
     </el-table>
     <!--分页组件-->
-    <el-pagination
-      :total="total"
-      style="margin-top: 8px;"
-      layout="total, prev, pager, next, sizes"
-      @size-change="sizeChange"
-      @current-change="pageChange"/>
+    <el-pagination :total="total" style="margin-top: 8px;" layout="total, prev, pager, next, sizes" @size-change="sizeChange" @current-change="pageChange" />
   </div>
 </template>
 
@@ -82,8 +73,7 @@ export default {
     checkPermission,
     beforeInit() {
       this.url = 'api/job'
-      const sort = 'sort,asc'
-      this.params = { page: this.page, size: this.size, sort: sort }
+      this.params = { page: this.page, size: this.size }
       const query = this.query
       const value = query.value
       const enabled = query.enabled
@@ -91,11 +81,11 @@ export default {
       if (enabled !== '' && enabled !== null) { this.params['enabled'] = enabled }
       return true
     },
-    subDelete(id) {
+    subDelete(uuid) {
       this.delLoading = true
-      del(id).then(res => {
+      del(uuid).then(res => {
         this.delLoading = false
-        this.$refs[id].doClose()
+        this.$refs[uuid].doClose()
         this.init()
         this.$notify({
           title: '删除成功',
@@ -104,7 +94,7 @@ export default {
         })
       }).catch(err => {
         this.delLoading = false
-        this.$refs[id].doClose()
+        this.$refs[uuid].doClose()
         console.log(err.response.data.message)
       })
     }
@@ -113,5 +103,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

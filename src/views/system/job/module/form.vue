@@ -2,13 +2,13 @@
   <el-dialog :append-to-body="true" :visible.sync="dialog" :title="isAdd ? '新增岗位' : '编辑岗位'" width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="名称" prop="name">
-        <el-input v-model="form.name" style="width: 370px;"/>
+        <el-input v-model="form.name" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="排序" prop="sort">
-        <el-input-number v-model.number="form.sort" :min="0" :max="999" controls-position="right" style="width: 370px;"/>
+        <el-input-number v-model.number="form.sort" :min="0" :max="999" controls-position="right" style="width: 370px;" />
       </el-form-item>
       <el-form-item v-if="form.pid !== 0" label="状态" prop="enabled">
-        <el-radio v-for="item in dicts" :key="item.id" v-model="form.enabled" :label="item.value">{{ item.label }}</el-radio>
+        <el-radio v-for="item in dicts" :key="item.uuid" v-model="form.enabled" :label="item.value">{{ item.label }}</el-radio>
       </el-form-item>
       <el-form-item label="所属部门">
         <treeselect v-model="deptId" :options="depts" style="width: 370px" placeholder="选择部门" />
@@ -33,6 +33,7 @@ export default {
       type: Boolean,
       required: true
     },
+    /* eslint-disable vue/prop-name-casing */
     sup_this: {
       type: Object,
       default: null
@@ -46,12 +47,12 @@ export default {
     return {
       loading: false, dialog: false, depts: [], deptId: null,
       form: {
-        id: '',
+        uuid: '',
         name: '',
         sort: 999,
         enabled: 'true',
         createTime: '',
-        dept: { id: '' }
+        dept: { uuid: '' }
       },
       rules: {
         name: [
@@ -68,7 +69,7 @@ export default {
       this.resetForm()
     },
     doSubmit() {
-      this.form.dept.id = this.deptId
+      this.form.dept.uuid = this.deptId
       this.$refs['form'].validate((valid) => {
         if (valid) {
           if (this.deptId === null || this.deptId === undefined) {
@@ -120,12 +121,12 @@ export default {
       this.$refs['form'].resetFields()
       this.deptId = null
       this.form = {
-        id: '',
+        uuid: '',
         name: '',
         sort: 999,
         enabled: 'true',
         createTime: '',
-        dept: { id: '' }
+        dept: { uuid: '' }
       }
     },
     getDepts() {
@@ -138,7 +139,7 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  /deep/ .el-input-number .el-input__inner {
-    text-align: left;
-  }
+/deep/ .el-input-number .el-input__inner {
+  text-align: left;
+}
 </style>

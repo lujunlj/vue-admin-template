@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
-    <eHeader :query="query"/>
+    <eHeader :query="query" />
     <!--表格渲染-->
     <div :style="'height: auto;max-height:' + height + 'overflow-y: auto;'">
       <el-table v-loading="loading" :data="data" highlight-current-row size="small" style="width: 100%;" @current-change="handleCurrentChange">
-        <el-table-column prop="name" label="名称"/>
-        <el-table-column prop="dataScope" label="数据权限"/>
-        <el-table-column prop="remark" label="描述"/>
+        <el-table-column prop="name" label="名称" />
+        <el-table-column prop="dataScope" label="数据权限" />
+        <el-table-column prop="remark" label="描述" />
         <el-table-column prop="createTime" label="创建日期">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -14,16 +14,12 @@
         </el-table-column>
         <el-table-column label="操作" width="150px" align="center">
           <template slot-scope="scope">
-            <edit v-if="checkPermission(['ADMIN','ROLES_ALL','ROLES_EDIT'])" :data="scope.row" :sup_this="sup_this"/>
-            <el-popover
-              v-if="checkPermission(['ADMIN','ROLES_ALL','ROLES_DELETE'])"
-              :ref="scope.row.id"
-              placement="top"
-              width="180">
+            <edit v-if="checkPermission(['ADMIN','ROLES_ALL','ROLES_EDIT'])" :data="scope.row" :sup_this="sup_this" />
+            <el-popover v-if="checkPermission(['ADMIN','ROLES_ALL','ROLES_DELETE'])" :ref="scope.row.uuid" placement="top" width="180">
               <p>确定删除本条数据吗？</p>
               <div style="text-align: right; margin: 0">
-                <el-button size="mini" type="text" @click="$refs[scope.row.id].doClose()">取消</el-button>
-                <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定</el-button>
+                <el-button size="mini" type="text" @click="$refs[scope.row.uuid].doClose()">取消</el-button>
+                <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.uuid)">确定</el-button>
               </div>
               <el-button slot="reference" type="danger" size="mini">删除</el-button>
             </el-popover>
@@ -32,12 +28,7 @@
       </el-table>
     </div>
     <!--分页组件-->
-    <el-pagination
-      :total="total"
-      style="margin-top: 8px;"
-      layout="total, prev, pager, next, sizes"
-      @size-change="sizeChange"
-      @current-change="pageChange"/>
+    <el-pagination :total="total" style="margin-top: 8px;" layout="total, prev, pager, next, sizes" @size-change="sizeChange" @current-change="pageChange" />
     <!--这里是授权模块代码-->
     <el-row :gutter="20" style="margin-top: 5px;">
       <!--权限分配-->
@@ -45,23 +36,10 @@
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix">
             <span class="role-span">权限分配</span>
-            <el-button
-              v-if="showButton && checkPermission(['ADMIN','ROLES_ALL','ROLES_EDIT'])"
-              :loading="permissionLoading"
-              icon="el-icon-check"
-              size="mini"
-              style="float: right; padding: 4px 10px"
-              type="info"
-              @click="savePermission">保存</el-button>
+            <el-button v-if="showButton && checkPermission(['ADMIN','ROLES_ALL','ROLES_EDIT'])" :loading="permissionLoading" icon="el-icon-check" size="mini" style="float: right; padding: 4px 10px" type="info" @click="savePermission">保存</el-button>
           </div>
           <div style="min-height: 320px;max-height:500px;overflow-y: auto;">
-            <el-tree
-              ref="permission"
-              :data="permissions"
-              :default-checked-keys="permissionIds"
-              :props="defaultProps"
-              show-checkbox
-              node-key="id"/>
+            <el-tree ref="permission" :data="permissions" :default-checked-keys="permissionIds" :props="defaultProps" show-checkbox node-key="uuid" />
           </div>
         </el-card>
       </el-col>
@@ -70,23 +48,10 @@
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix">
             <span class="role-span">菜单分配</span>
-            <el-button
-              v-if="showButton && checkPermission(['ADMIN','ROLES_ALL','ROLES_EDIT'])"
-              :loading="menuLoading"
-              icon="el-icon-check"
-              size="mini"
-              style="float: right; padding: 4px 10px"
-              type="info"
-              @click="saveMenu">保存</el-button>
+            <el-button v-if="showButton && checkPermission(['ADMIN','ROLES_ALL','ROLES_EDIT'])" :loading="menuLoading" icon="el-icon-check" size="mini" style="float: right; padding: 4px 10px" type="info" @click="saveMenu">保存</el-button>
           </div>
           <div style="min-height: 320px;max-height:500px;overflow-y: auto;">
-            <el-tree
-              ref="menu"
-              :data="menus"
-              :default-checked-keys="menuIds"
-              :props="defaultProps"
-              show-checkbox
-              node-key="id"/>
+            <el-tree ref="menu" :data="menus" :default-checked-keys="menuIds" :props="defaultProps" show-checkbox node-key="uuid" />
           </div>
         </el-card>
       </el-col>
@@ -113,7 +78,7 @@ export default {
         children: 'children',
         label: 'label'
       },
-      currentId: 0, permissionLoading: false, menuLoading: false, showButton: false,
+      currentId: '0', permissionLoading: false, menuLoading: false, showButton: false,
       delLoading: false, sup_this: this, permissions: [], permissionIds: [], menus: [], menuIds: [],
       height: document.documentElement.clientHeight - 94.5 - 260 + 'px;'
     }
@@ -139,18 +104,17 @@ export default {
       this.$refs.menu.setCheckedKeys([])
       this.showButton = false
       this.url = 'api/roles'
-      const sort = 'id,desc'
       const query = this.query
       const value = query.value
-      this.params = { page: this.page, size: this.size, sort: sort }
+      this.params = { current: this.current, size: this.size }
       if (value) { this.params['name'] = value }
       return true
     },
-    subDelete(id) {
+    subDelete(uuid) {
       this.delLoading = true
-      del(id).then(res => {
+      del(uuid).then(res => {
         this.delLoading = false
-        this.$refs[id].doClose()
+        this.$refs[uuid].doClose()
         this.init()
         this.$notify({
           title: '删除成功',
@@ -159,7 +123,7 @@ export default {
         })
       }).catch(err => {
         this.delLoading = false
-        this.$refs[id].doClose()
+        this.$refs[uuid].doClose()
         console.log(err.response.data.message)
       })
     },
@@ -180,36 +144,38 @@ export default {
         this.$refs.permission.setCheckedKeys([])
         this.$refs.menu.setCheckedKeys([])
         // 保存当前的角色id
-        this.currentId = val.id
+        this.currentId = val.uuid
         // 点击后显示按钮
         this.showButton = true
         // 初始化
         this.menuIds = []
         this.permissionIds = []
         // 菜单数据需要特殊处理
+        console.log(val.menus)
         val.menus.forEach(function(data, index) {
           let add = true
           for (let i = 0; i < val.menus.length; i++) {
-            if (data.id === val.menus[i].pid) {
+            if (data.uuid === val.menus[i].pid) {
+              console.log(data.uuid)
               add = false
               break
             }
           }
           if (add) {
-            _this.menuIds.push(data.id)
+            _this.menuIds.push(data.uuid)
           }
         })
         // 处理权限数据
         val.permissions.forEach(function(data, index) {
-          _this.permissionIds.push(data.id)
+          _this.permissionIds.push(data.uuid)
         })
       }
     },
     savePermission() {
       this.permissionLoading = true
-      const role = { id: this.currentId, permissions: [] }
+      const role = { uuid: this.currentId, permissions: [] }
       this.$refs.permission.getCheckedKeys().forEach(function(data, index) {
-        const permission = { id: data }
+        const permission = { uuid: data }
         role.permissions.push(permission)
       })
       editPermission(role).then(res => {
@@ -227,15 +193,15 @@ export default {
     },
     saveMenu() {
       this.menuLoading = true
-      const role = { id: this.currentId, menus: [] }
+      const role = { uuid: this.currentId, menus: [] }
       // 得到半选的父节点数据，保存起来
       this.$refs.menu.getHalfCheckedNodes().forEach(function(data, index) {
-        const permission = { id: data.id }
+        const permission = { uuid: data.uuid }
         role.menus.push(permission)
       })
       // 得到已选中的 key 值
       this.$refs.menu.getCheckedKeys().forEach(function(data, index) {
-        const permission = { id: data }
+        const permission = { uuid: data }
         role.menus.push(permission)
       })
       editMenu(role).then(res => {
@@ -255,7 +221,7 @@ export default {
       // 无刷新更新 表格数据
       get(this.currentId).then(res => {
         for (let i = 0; i < this.data.length; i++) {
-          if (res.id === this.data[i].id) {
+          if (res.uuid === this.data[i].uuid) {
             this.data[i] = res
             break
           }
@@ -267,8 +233,9 @@ export default {
 </script>
 
 <style scoped>
-  .role-span {
-    font-weight: bold;color: #303133;
-    font-size: 15px;
-  }
+.role-span {
+  font-weight: bold;
+  color: #303133;
+  font-size: 15px;
+}
 </style>
